@@ -1,0 +1,10 @@
+[Unit]
+Description=Initialize 3d printer webcam
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/octopi_scripts/init_octopi_webcam.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+---
+- name: Setup octopi
+  hosts: all
+  remote_user: pi
+  tasks:
+    - name: Create /opt/octopi_scripts
+      file:
+        path: "/opt/octopi_scripts"
+        state: directory
+      become: yes
+
+    - name: Copy init_octopi_webcam.sh
+      copy:
+        src: "{{ playbook_dir }}/../init_octopi_webcam.sh"
+        dest: "/opt/octopi_scripts"
+      become: yes
+      register: init_octopi_webcam_script
+
+    - name: Copy init_octopi_webcam.service
+      copy:
+        src: "{{ playbook_dir }}/../systemd/init_octopi_webcam.service"
+        dest: "/lib/systemd/system"
+      become: true
+      register: init_octopi_webcam_service
+
+    - name: Start init_octopi_webcam systemd service
+      systemd:
+        name: init_octopi_webcam
+        enabled: yes
+        state: "{{ 'restarted' if init_octopi_webcam_script.changed else 'started' }}"
+        daemon_reload: "{{ init_octopi_webcam_service.changed }}"
+      become: yes
